@@ -1,4 +1,11 @@
 terraform {
+  backend "remote" {
+    organization = "technat"
+
+    workspaces {
+      name = "tailnet"
+    }
+  }
   required_providers {
     tailscale = {
       source  = "tailscale/tailscale"
