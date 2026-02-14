@@ -89,6 +89,31 @@ resource "tailscale_acl" "as_hujson" {
         "dst": ["tag:acl-backup"],
         "ip":  ["*"],
       },
+      {
+        // see https://github.com/tailscale/tsidp#setting-an-application-capability-grant
+        "app": {
+          "tailscale.com/cap/tsidp": [
+            {
+              // allow access to UI
+              "allow_admin_ui": true,
+
+              // allow dynamic client registration
+              "allow_dcr": true,
+
+              // Secure Token Service (STS) controls
+              "users":     ["*"],
+              "resources": ["*"],
+
+              // extraClaims are included in the id_token
+              // recommend: keep this small and simple
+              "extraClaims": {},
+
+              // include extraClaims data in /userinfo response
+              "includeInUserInfo": true,
+            },
+          ],
+        },
+      },
 
       // Admins can access the k3s cluster on some ports, k3s cluster has full local net communication
       {
