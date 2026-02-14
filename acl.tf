@@ -223,7 +223,7 @@ resource "tailscale_acl" "as_hujson" {
         "deny": ["tag:acl-kvm:443"],
       },
       {
-        "src":    "autogroup:tagged", // some tinkering server to the idp
+        "src":    "tag:acl-tinkering", // some tinkering server to the idp
         "accept": ["tag:idp:443"],
       },
 
