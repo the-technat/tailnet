@@ -90,7 +90,10 @@ resource "tailscale_acl" "as_hujson" {
         "ip":  ["*"],
       },
       {
+
         // see https://github.com/tailscale/tsidp#setting-an-application-capability-grant
+        "src": ["autogroup:admin"],
+        "dst": ["tag:acl-tinkering"], // tag the idp node is tagged with
         "app": {
           "tailscale.com/cap/tsidp": [
             {
