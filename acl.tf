@@ -8,14 +8,15 @@ resource "tailscale_acl" "as_hujson" {
       "tag:acl-tinkering":     ["autogroup:admin"], // tag for random tinkering devices
       "tag:acl-backup":        ["autogroup:admin"], // tag for backup NAS devices
       "tag:acl-k3s":           ["autogroup:admin"], // tag for servers in the k3s cluster
+      "tag:idp":               ["autogroup:admin"], // tag for nodes running the TSIDP server
     },
 
     "autoApprovers": {
       "routes": {
         "192.168.0.0/16":    ["tag:acl-backup"], // one backup NAS uses this
-        "192.168.250.0/24": ["tag:acl-kvm"], // one KVM device uses this
-        "10.42.0.0/16":      ["tag:acl-k3s"], // default k3s podCIDR
-        "2001:cafe:42::/56": ["tag:acl-k3s"], // default k3s podCIDR
+        "192.168.250.0/24":  ["tag:acl-kvm"],    // one KVM device uses this
+        "10.42.0.0/16":      ["tag:acl-k3s"],    // default k3s podCIDR
+        "2001:cafe:42::/56": ["tag:acl-k3s"],    // default k3s podCIDR
       },
       "exitNode": ["tag:feature-exitNode"], // auto-approve exit-nodes that have the tag
     },
@@ -89,33 +90,42 @@ resource "tailscale_acl" "as_hujson" {
         "dst": ["tag:acl-backup"],
         "ip":  ["*"],
       },
-      {
 
+      // Admins can access the TSIDP admin UI
+      {
         // see https://github.com/tailscale/tsidp#setting-an-application-capability-grant
         "src": ["autogroup:admin"],
-        "dst": ["tag:acl-tinkering"], // tag the idp node is tagged with
+        "dst": ["tag:idp"], 
+        "ip":  ["443"],
         "app": {
           "tailscale.com/cap/tsidp": [
             {
               // allow access to UI
               "allow_admin_ui": true,
-
-              // allow dynamic client registration
-              "allow_dcr": true,
-
-              // Secure Token Service (STS) controls
-              "users":     ["*"],
-              "resources": ["*"],
-
-              // extraClaims are included in the id_token
-              // recommend: keep this small and simple
-              "extraClaims": {},
-
-              // include extraClaims data in /userinfo response
-              "includeInUserInfo": true,
             },
           ],
         },
+      },
+      // Any member and shared user can access all apps that allow "Login with TSIDP" (e.g flat auth, do authz in app)
+      {
+        "src": ["autogroup:member", "autogroup:shared"],
+        "dst": ["tag:idp"],
+        "ip":  ["443"],
+        "app": {
+          "tailscale.com/cap/tsidp": [
+            {
+              "allow_dcr": true,
+              "users":     ["*"],
+              "resources": ["*"],
+            },
+          ],
+        },
+      },
+      // All tagged devices (i.e not users) can verify auth requests by contacting the IDP
+      {
+        "src": ["autogroup:tagged"],
+        "dst": ["tag:idp"],
+        "ip":  ["443"],
       },
 
       // Admins can access the k3s cluster on some ports, k3s cluster has full local net communication
@@ -204,6 +214,19 @@ resource "tailscale_acl" "as_hujson" {
         "src":    "10.42.0.1", // some pod to pod
         "accept": ["10.42.0.2:80"],
       },
+      {
+        "src":    "tag:acl-tinkering", // some tinkering server to the backup net
+        "deny": ["tag:acl-backup:5000"],
+      },
+      {
+        "src":    "tag:acl-tinkering", // some tinkering server to the kvm devices
+        "deny": ["tag:acl-kvm:443"],
+      },
+      {
+        "src":    "autogroup:tagged", // some tinkering server to the idp
+        "accept": ["tag:idp:443"],
+      },
+
     ],
   }
   EOF
