@@ -11,6 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     concurrency: prod
     environment: prod
+    defaults:
+      run:
+        shell: bash
+        working-directory: tsidp
     steps:
       - name: Get code
         uses: actions/checkout@v4

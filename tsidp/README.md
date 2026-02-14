@@ -8,3 +8,8 @@
 - Generate token for Github workflow and set as action secret named `FLY_ORG_API_TOKEN`
  - use `fly tokens create deploy -x 999999h` to do this locally
 - Push to the repo and let the workflow do the rest
+- To initially join the idp to the tailnet, check the logs of the app for the login URL
+
+## Tailscale config 
+
+See [../acl.tf](../acl.tf) for the app configs
