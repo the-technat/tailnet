@@ -6,6 +6,5 @@ resource "tailscale_tailnet_settings" "settings" {
   devices_key_duration_days                   = 30
   users_approval_on                           = true
   users_role_allowed_to_join_external_tailnet = "member"
-  posture_identity_collection_on              = true
   https_enabled                               = true
 }
