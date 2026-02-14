@@ -9,6 +9,7 @@
  - use `fly tokens create deploy -x 999999h` to do this locally
 - Push to the repo and let the workflow do the rest
 - To initially join the idp to the tailnet, check the logs of the app for the login URL
+- Once added to the tailnet, ensure the IDP is tagged using `tag:idp` 
 
 ## Tailscale config 
 
