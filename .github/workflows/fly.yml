@@ -1,0 +1,20 @@
+name: Deploy TSIDP App
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+    runs-on: ubuntu-latest
+    concurrency: prod
+    environment: prod
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+      - name: Setup flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@v1
+      - name: Deploy Prod app
+        run: flyctl deploy --remote-only

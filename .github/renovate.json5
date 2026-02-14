@@ -1,0 +1,30 @@
+{
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  extends: [
+    'config:recommended',
+    'schedule:earlyMondays',
+  ],
+  lockFileMaintenance: {
+    enabled: true,
+  },
+  customManagers: [
+    {
+      customType: 'regex',
+      managerFilePatterns: [
+        '/^fly.toml$/',
+      ],
+      matchStrings: [
+        "image = 'ghcr.io/tailscale/tsidp:(?<currentValue>.*?)'\\n",
+      ],
+      packageNameTemplate: 'ghcr.io/tailscale/tsidp',
+      datasourceTemplate: 'docker',
+    },
+  ],
+  packageRules: [
+    {
+      matchUpdateTypes: ["minor", "patch"],
+      matchCurrentVersion: "!/^0/",
+      automerge: true
+    }
+  ],
+}

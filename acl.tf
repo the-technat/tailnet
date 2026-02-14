@@ -102,6 +102,7 @@ resource "tailscale_acl" "as_hujson" {
             {
               // allow access to UI
               "allow_admin_ui": true,
+              "allow_dcr": true,
             },
           ],
         },
