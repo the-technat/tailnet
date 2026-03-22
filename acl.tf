@@ -20,7 +20,11 @@ resource "tailscale_acl" "as_hujson" {
       },
       "exitNode": ["tag:feature-exitNode"], // auto-approve exit-nodes that have the tag
     },
-
+    "groups": {
+      "group:mullvad": [
+        "technat@technat.ch",
+      ],
+    },
     "nodeAttrs": [
       {
         "target": ["tag:feature-funnel"],
@@ -31,7 +35,7 @@ resource "tailscale_acl" "as_hujson" {
         "attr":   ["funnel"],
       },
       {
-        "target": ["technat@technat.ch"], // my private devices are allowed to use the mullvad addon
+        "target": ["group:mullvad"], // devices in this group are allowed to use mullvad licenses
         "attr":   ["mullvad"],
       },
     ],
