@@ -18,6 +18,9 @@ resource "tailscale_acl" "as_hujson" {
         "192.168.250.0/24":  ["tag:acl-kvm"],    // one KVM device uses this
       },
       "exitNode": ["tag:feature-exitNode"], // auto-approve exit-nodes that have the tag
+      "services": { // auto-approve exposed services
+        "tag:k8s": ["tag:k8s"], // for things the k8s-operator handles
+      },
     },
     "groups": {
       "group:mullvad": [
@@ -144,15 +147,15 @@ resource "tailscale_acl" "as_hujson" {
         "ip":  ["*"],
       },
 
-      // Anyone can access the Kubernetes API of clusters (AUTH part)
+      // Anyone can access the Kubernetes API or exposed services of clusters (AUTH part)
       {
         "src": ["autogroup:member"],
-        "dst": ["tag:k8s-operator"],
-        "ip":  ["tcp:443"],
+        "dst": ["tag:k8s"],
+        "ip":  ["tcp:80", "tcp:443"],
       },
-      { // authorize Tailnet admins to be kubernetes admins too (AUTHZ part)
+      { // authorize Tailnet admins to be kubernetes admins (AUTHZ part)
         "src": ["autogroup:admin"],
-        "dst": ["tag:k8s-operator"],
+        "dst": ["tag:k8s"],
         "app": {
           "tailscale.com/cap/kubernetes": [{
             "impersonate": {
