@@ -7,7 +7,8 @@ resource "tailscale_acl" "as_hujson" {
       "tag:acl-kvm":           ["autogroup:admin"], // tag for KVM over IP devices
       "tag:acl-tinkering":     ["autogroup:admin"], // tag for random tinkering devices
       "tag:acl-backup":        ["autogroup:admin"], // tag for backup NAS devices
-      "tag:acl-k3s":           ["autogroup:admin"], // tag for servers in the k3s cluster
+      "tag:k8s-operator":      ["autogroup:admin"], // tag for the K8s operator and API endpoint
+      "tag:k8s":               ["tag:k8s-operator"], //tag for services exposed via TS operator
       "tag:idp":               ["autogroup:admin"], // tag for nodes running the TSIDP server
     },
 
@@ -15,8 +16,6 @@ resource "tailscale_acl" "as_hujson" {
       "routes": {
         "192.168.0.0/16":    ["tag:acl-backup"], // one backup NAS uses this
         "192.168.250.0/24":  ["tag:acl-kvm"],    // one KVM device uses this
-        "10.42.0.0/16":      ["tag:acl-k3s"],    // default k3s podCIDR
-        "2001:cafe:42::/56": ["tag:acl-k3s"],    // default k3s podCIDR
       },
       "exitNode": ["tag:feature-exitNode"], // auto-approve exit-nodes that have the tag
     },
@@ -133,18 +132,6 @@ resource "tailscale_acl" "as_hujson" {
         "ip":  ["443"],
       },
 
-      // Admins can access the k3s cluster on some ports, k3s cluster has full local net communication
-      {
-        "src": ["tag:acl-k3s", "10.42.0.0/16", "2001:cafe:42::/56"],
-        "dst": ["tag:acl-k3s", "10.42.0.0/16", "2001:cafe:42::/56"],
-        "ip":  ["*"],
-      },
-      {
-        "src": ["autogroup:admin"],
-        "dst": ["tag:acl-k3s", "10.42.0.0/16", "2001:cafe:42::/56"],
-        "ip":  ["*"],
-      },
-
       // tinkering devices can freely communicate and everyone can access them in the tailnet
       {
         "src": ["tag:acl-tinkering"],
@@ -176,14 +163,6 @@ resource "tailscale_acl" "as_hujson" {
         "users":  ["autogroup:nonroot", "root"],
       },
 
-      // Admins can access k3s cluster nodes without asking
-      {
-        "action": "accept",
-        "src":    ["autogroup:admin"],
-        "dst":    ["tag:acl-k3s"],
-        "users":  ["autogroup:nonroot"],
-      },
-
       // Admins can access KVM devices with asking
       {
         "action": "check",
@@ -202,22 +181,6 @@ resource "tailscale_acl" "as_hujson" {
       {
         "src":    "technat@technat.ch",
         "accept": ["tag:acl-kvm:22"],
-      },
-      {
-        "src":    "technat@technat.ch",
-        "accept": ["tag:acl-k3s:6443"],
-      },
-      {
-        "src":    "tag:acl-k3s",
-        "accept": ["tag:acl-k3s:6443"],
-      },
-      {
-        "src":    "10.42.0.1", // some pod to CP
-        "accept": ["tag:acl-k3s:6443"],
-      },
-      {
-        "src":    "10.42.0.1", // some pod to pod
-        "accept": ["10.42.0.2:80"],
       },
       {
         "src":    "tag:acl-tinkering", // some tinkering server to the backup net
