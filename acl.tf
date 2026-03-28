@@ -143,6 +143,24 @@ resource "tailscale_acl" "as_hujson" {
         "dst": ["tag:acl-tinkering"],
         "ip":  ["*"],
       },
+
+      // Anyone can access the Kubernetes API of clusters (AUTH part)
+      {
+        "src": ["autogroup:member"],
+        "dst": ["tag:k8s-operator"],
+        "ip":  ["tcp:443"],
+      },
+      { // authorize Tailnet admins to be kubernetes admins too (AUTHZ part)
+        "src": ["autogroup:admin"],
+        "dst": ["tag:k8s-operator"],
+        "app": {
+          "tailscale.com/cap/kubernetes": [{
+            "impersonate": {
+              "groups": ["system:masters"],
+            },
+          }],
+        },
+      },
     ],
 
     // Define users and devices that can use Tailscale SSH.
