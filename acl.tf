@@ -2,14 +2,15 @@ resource "tailscale_acl" "as_hujson" {
   acl = <<EOF
   {
     "tagOwners": {
-      "tag:feature-exitNode":  ["autogroup:admin"], // devices with this tag are grantaed exit-node advertisement automatically
+      "tag:feature-exitNode":  ["autogroup:admin"], // devices with this tag are granted exit-node advertisement automatically
       "tag:feature-funnel":    ["autogroup:admin"], // deviecs with this tag are granted funnel permissions automatically
-      "tag:acl-kvm":           ["autogroup:admin"], // tag for KVM over IP devices
-      "tag:acl-tinkering":     ["autogroup:admin"], // tag for random tinkering devices
       "tag:acl-backup":        ["autogroup:admin"], // tag for backup NAS devices
+      "tag:acl-faultier":      ["autogroup:admin"], // tag for faultier services
       "tag:k8s-operator":      ["autogroup:admin"], // tag for the K8s operator and API endpoint
       "tag:k8s":               ["tag:k8s-operator"], //tag for services exposed via TS operator
       "tag:idp":               ["autogroup:admin"], // tag for nodes running the TSIDP server
+      "tag:acl-kvm":           ["autogroup:admin"], // tag for KVM over IP devices
+      "tag:acl-tinkering":     ["autogroup:admin"], // tag for random tinkering devices
     },
 
     "autoApprovers": {
@@ -26,6 +27,9 @@ resource "tailscale_acl" "as_hujson" {
       "group:mullvad": [
         "technat@technat.ch",
       ],
+      "group:funnel": [
+        "technat@technat.ch",
+      ],
     },
     "nodeAttrs": [
       {
@@ -33,11 +37,11 @@ resource "tailscale_acl" "as_hujson" {
         "attr":   ["funnel"], // grant funnel to devices with this tag
       },
       {
-        "target": ["technat@technat.ch"], // my private devices can funnel automatically
+      "target": ["group:funnel"], // users in this group can use funnel without approval
         "attr":   ["funnel"],
       },
       {
-        "target": ["group:mullvad"], // devices in this group are allowed to use mullvad licenses
+        "target": ["group:mullvad"], // users in this group are allowed to use mullvad licenses
         "attr":   ["mullvad"],
       },
     ],
@@ -95,6 +99,13 @@ resource "tailscale_acl" "as_hujson" {
         "src": ["tag:acl-backup"],
         "dst": ["tag:acl-backup"],
         "ip":  ["*"],
+      },
+
+      // Faultier and faultier services are only allowed from admins
+      {
+        "dst": ["tag:acl-faultier"],
+        "src": ["autogroup:admin"],
+        "ip":  ["443"],
       },
 
       // Admins can access the TSIDP admin UI
@@ -191,6 +202,14 @@ resource "tailscale_acl" "as_hujson" {
         "dst":    ["tag:acl-kvm"],
         "users":  ["autogroup:nonroot", "root"],
       },
+
+      // Admins can access faultier with asking
+      {
+        "action": "check",
+        "src":    ["autogroup:admin"],
+        "dst":    ["tag:acl-faultier"],
+        "users":  ["autogroup:nonroot", "root"],
+      },
     ],
 
     // Test access rules every time they're saved.
@@ -202,6 +221,10 @@ resource "tailscale_acl" "as_hujson" {
       {
         "src":    "technat@technat.ch",
         "accept": ["tag:acl-kvm:22"],
+      },
+      {
+        "src":    "technat@technat.ch",
+        "accept": ["tag:acl-faultier:443"],
       },
       {
         "src":    "tag:acl-tinkering", // some tinkering server to the backup net
