@@ -105,6 +105,11 @@ resource "tailscale_acl" "as_hujson" {
       {
         "dst": ["tag:acl-faultier"],
         "src": ["autogroup:admin"],
+        "ip":  ["22"],
+      },
+      {
+        "dst": ["tag:acl-faultier"],
+        "src": ["autogroup:admin"],
         "ip":  ["443"],
       },
 
