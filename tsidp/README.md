@@ -1,5 +1,7 @@
 # Tailscale Identity Provider
 
+Currently not deployed.
+
 [tsidp](https://github.com/tailscale/tsidp?tab=readme-ov-file) hosted on fly.io.
 
 ## Initial Setup
