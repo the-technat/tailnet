@@ -8,7 +8,7 @@ resource "tailscale_acl" "as_hujson" {
       "tag:acl-faultier":      ["autogroup:admin"], // tag for faultier services
       "tag:k8s-operator":      ["autogroup:admin"], // tag for the K8s operator and API endpoint
       "tag:k8s":               ["tag:k8s-operator"], //tag for services exposed via TS operator
-      "tag:idp":               ["autogroup:admin"], // tag for nodes running the TSIDP server
+      // "tag:idp":               ["autogroup:admin"], // tag for nodes running the TSIDP server
       "tag:acl-kvm":           ["autogroup:admin"], // tag for KVM over IP devices
       "tag:acl-tinkering":     ["autogroup:admin"], // tag for random tinkering devices
     },
@@ -114,42 +114,42 @@ resource "tailscale_acl" "as_hujson" {
       },
 
       // Admins can access the TSIDP admin UI
-      {
+      // {
         // see https://github.com/tailscale/tsidp#setting-an-application-capability-grant
-        "src": ["autogroup:admin"],
-        "dst": ["tag:idp"], 
-        "ip":  ["443"],
-        "app": {
-          "tailscale.com/cap/tsidp": [
-            {
-              // allow access to UI
-              "allow_admin_ui": true,
-              "allow_dcr": true,
-            },
-          ],
-        },
-      },
+      //  "src": ["autogroup:admin"],
+      //  "dst": ["tag:idp"], 
+      //  "ip":  ["443"],
+      //  "app": {
+      //    "tailscale.com/cap/tsidp": [
+      //      {
+      //        // allow access to UI
+      //        "allow_admin_ui": true,
+      //        "allow_dcr": true,
+      //      },
+      //    ],
+      //  },
+      //},
       // Any member and shared user can access all apps that allow "Login with TSIDP" (e.g flat auth, do authz in app)
-      {
-        "src": ["autogroup:member", "autogroup:shared"],
-        "dst": ["tag:idp"],
-        "ip":  ["443"],
-        "app": {
-          "tailscale.com/cap/tsidp": [
-            {
-              "allow_dcr": true,
-              "users":     ["*"],
-              "resources": ["*"],
-            },
-          ],
-        },
-      },
+      // {
+      //  "src": ["autogroup:member", "autogroup:shared"],
+      //  "dst": ["tag:idp"],
+      //  "ip":  ["443"],
+      //  "app": {
+      //    "tailscale.com/cap/tsidp": [
+      //      {
+      //        "allow_dcr": true,
+      //        "users":     ["*"],
+      //        "resources": ["*"],
+      //      },
+      //    ],
+      //  },
+      // },
       // All tagged devices (i.e not users) can verify auth requests by contacting the IDP
-      {
-        "src": ["autogroup:tagged"],
-        "dst": ["tag:idp"],
-        "ip":  ["443"],
-      },
+      // {
+      //  "src": ["autogroup:tagged"],
+      //  "dst": ["tag:idp"],
+      //  "ip":  ["443"],
+      // },
 
       // tinkering devices can freely communicate and everyone can access them in the tailnet
       {
@@ -239,10 +239,10 @@ resource "tailscale_acl" "as_hujson" {
         "src":    "tag:acl-tinkering", // some tinkering server to the kvm devices
         "deny": ["tag:acl-kvm:443"],
       },
-      {
-        "src":    "tag:acl-tinkering", // some tinkering server to the idp
-        "accept": ["tag:idp:443"],
-      },
+      // {
+      //  "src":    "tag:acl-tinkering", // some tinkering server to the idp
+      //  "accept": ["tag:idp:443"],
+      // },
 
     ],
   }
