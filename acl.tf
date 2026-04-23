@@ -146,7 +146,7 @@ resource "tailscale_acl" "as_hujson" {
         "ip":  ["*"],
       },
       {
-        "src": ["autogroup:member"],
+        "src": ["autogroup:member", "asdfgugus@github"],
         "dst": ["tag:acl-tinkering"],
         "ip":  ["*"],
       },
@@ -183,7 +183,7 @@ resource "tailscale_acl" "as_hujson" {
       // Anyone can access tinkering devices without asking
       {
         "action": "accept",
-        "src":    ["autogroup:member"],
+        "src":    ["autogroup:member","asdfgugus@github"],
         "dst":    ["tag:acl-tinkering"],
         "users":  ["autogroup:nonroot", "root"],
       },
