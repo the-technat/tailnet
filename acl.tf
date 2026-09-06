@@ -10,12 +10,14 @@ resource "tailscale_acl" "as_hujson" {
       // "tag:idp":               ["autogroup:admin"], // tag for nodes running the TSIDP server
       "tag:acl-kvm":           ["autogroup:admin"], // tag for KVM over IP devices
       "tag:acl-tinkering":     ["autogroup:admin"], // tag for random tinkering devices
+      "tag:acl-printers":      ["autogroup:admin"], // tag for printer network
     },
 
     "autoApprovers": {
       "routes": {
-        "192.168.0.0/16":    ["tag:acl-backup"], // one backup NAS uses this
-        "192.168.250.0/24":  ["tag:acl-kvm"],    // one KVM device uses this
+        "192.168.0.0/16":    ["tag:acl-backup"],   // one backup NAS uses this
+        "192.168.250.0/24":  ["tag:acl-kvm"],      // one KVM device uses this
+        "192.168.111.0/24":  ["tag:acl-printers"], // printibus advertises this
       },
       "exitNode": ["tag:feature-exitNode"], // auto-approve exit-nodes that have the tag
       "services": { // auto-approve exposed services
@@ -100,6 +102,12 @@ resource "tailscale_acl" "as_hujson" {
         "ip":  ["*"],
       },
 
+      // Admins can access the printer network on ssh/web
+      {
+          "src": ["autogroup:admin"],
+          "dst": ["tag:acl-printers", "192.168.111.0/24"],
+          "ip":  ["*"],
+      },
 
       // Admins can access the TSIDP admin UI
       // {
@@ -195,6 +203,15 @@ resource "tailscale_acl" "as_hujson" {
         "dst":    ["tag:acl-kvm"],
         "users":  ["autogroup:nonroot", "root"],
       },
+
+      // Admins can access the printer devices
+      {
+        "action": "check",
+        "src":    ["autogroup:admin"],
+        "dst":    ["tag:acl-printers"],
+        "users":  ["autogroup:nonroot", "root"],
+      },
+
     ],
 
     // Test access rules every time they're saved.
