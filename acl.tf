@@ -159,6 +159,11 @@ resource "tailscale_acl" "as_hujson" {
         "dst": ["tag:acl-tinkering"],
         "ip":  ["*"],
       },
+      {
+        "src": ["autogroup:member"],
+        "dst": ["10.0.0.0/24"],
+        "ip":  ["*"],
+      },
 
       // Anyone can access the Kubernetes API or exposed services of clusters (AUTH part)
       {
