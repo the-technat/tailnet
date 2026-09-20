@@ -18,6 +18,7 @@ resource "tailscale_acl" "as_hujson" {
         "192.168.0.0/16":    ["tag:acl-backup"],   // one backup NAS uses this
         "192.168.250.0/24":  ["tag:acl-kvm"],      // one KVM device uses this
         "192.168.111.0/24":  ["tag:acl-printers"], // printibus advertises this
+        "10.0.0.0/24":       ["tag:acl-tinkering"], // tinkering devices can advertise these routes
       },
       "exitNode": ["tag:feature-exitNode"], // auto-approve exit-nodes that have the tag
       "services": { // auto-approve exposed services
