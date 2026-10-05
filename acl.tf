@@ -155,12 +155,12 @@ resource "tailscale_acl" "as_hujson" {
         "ip":  ["*"],
       },
       {
-        "src": ["autogroup:member"],
+        "src": ["autogroup:member", "autogroup:shared"],
         "dst": ["tag:acl-tinkering"],
         "ip":  ["*"],
       },
       {
-        "src": ["autogroup:member"],
+        "src": ["autogroup:member", "autogroup:shared"],
         "dst": ["10.0.0.0/24"],
         "ip":  ["*"],
       },
