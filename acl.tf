@@ -161,7 +161,7 @@ resource "tailscale_acl" "as_hujson" {
       },
       {
         "src": ["autogroup:member", "autogroup:shared"],
-        "dst": ["10.0.0.0/24"],
+        "dst": ["10.0.10.0/24"],
         "ip":  ["*"],
       },
 
