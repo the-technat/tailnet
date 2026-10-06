@@ -17,7 +17,7 @@ jobs:
         working-directory: tsidp
     steps:
       - name: Get code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Setup flyctl
         uses: superfly/flyctl-actions/setup-flyctl@v1
       - name: Deploy Prod app
