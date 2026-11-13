@@ -23,7 +23,7 @@ resource "tailscale_acl" "as_hujson" {
       "exitNode": ["tag:feature-exitNode"], // auto-approve exit-nodes that have the tag
       "services": { // auto-approve exposed services
         "tag:k8s":         ["tag:k8s"], // for things the k8s-operator handles
-        "svc:opencode":    ["tag:acl-tinkering"],
+        "svc:agent":    ["tag:acl-tinkering"],
         "svc:code-server": ["tag:acl-tinkering"],
       },
     },
@@ -168,7 +168,7 @@ resource "tailscale_acl" "as_hujson" {
       },
       {
         "src": ["autogroup:admin"],
-        "dst": ["svc:opencode", "svc:code-server"],
+        "dst": ["svc:agent", "svc:code-server"],
         "ip":  ["tcp:443"], 
       },
 
@@ -247,7 +247,7 @@ resource "tailscale_acl" "as_hujson" {
       },
       {
         "src": "technat@technat.ch",   
-        "accept": ["svc:opencode:443", "svc:code-server:443"],
+        "accept": ["svc:agent:443", "svc:code-server:443"],
       },
       // {
       //  "src":    "tag:acl-tinkering", // some tinkering server to the idp
