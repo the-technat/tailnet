@@ -167,7 +167,7 @@ resource "tailscale_acl" "as_hujson" {
         "ip":  ["*"],
       },
       {
-        "src": ["autogroup:admin"],
+        "src": ["autogroup:member"],
         "dst": ["svc:agent", "svc:code-server"],
         "ip":  ["tcp:443"], 
       },
